@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { motion, AnimatePresence } from "framer-motion";
-import { LayoutDashboard, History, Eye, Settings, Sparkles, Store, ShoppingCart, X, Bell, Moon, Sun, Globe, Shield, User, Check, Mail, Lock } from "lucide-react";
+import { LayoutDashboard, History, Eye, Settings, Sparkles, Store, ShoppingCart, X, Bell, Moon, Sun, Globe, Shield, User, Check, Mail, Lock, DollarSign, Target, Activity, TrendingUp, BarChart2, Search, Zap, MousePointerClick, Megaphone, CheckSquare, Brain } from "lucide-react";
 import { KitiMascot } from "./KitiMascot";
 import { useState, useEffect } from "react";
 
@@ -11,9 +11,15 @@ interface SidebarProps {
 }
 
 const sellerItems = [
-  { id: "audit",        label: "Listing Audit",   icon: LayoutDashboard },
-  { id: "time-machine", label: "Time Machine",     icon: History },
-  { id: "competitor",   label: "Competitor Spy",   icon: Eye },
+  { id: "overview",      label: "Overview",                 icon: LayoutDashboard },
+  { id: "competitors",   label: "Market Trends & Comps",    icon: TrendingUp },
+  { id: "revenue",       label: "Revenue & Market Share",   icon: DollarSign },
+  { id: "insights",      label: "Customer Insights",        icon: Target },
+  { id: "listing",       label: "Listing Optimization",     icon: MousePointerClick },
+  { id: "seo",           label: "Keyword & SEO",            icon: Search },
+  { id: "aeo",           label: "AI Search (AEO) 🔥",       icon: Brain },
+  { id: "ads",           label: "Ads Intelligence",         icon: Megaphone },
+  { id: "actions",       label: "Action Center",            icon: CheckSquare },
 ];
 
 const buyerItems = [
@@ -388,7 +394,7 @@ export function Sidebar({ active, onChange, perspective }: SidebarProps) {
           <div className="h-9 w-9 rounded-xl bg-primary-gradient grid place-items-center shadow-glow">
             <Sparkles className="h-4 w-4 text-white" />
           </div>
-          <span className="font-bold text-lg">ListIQ</span>
+          <span className="font-bold text-lg">ListIQ - Intelligence</span>
         </Link>
 
         <div className={`flex items-center gap-2 rounded-xl px-3 py-2 mb-4 text-xs font-semibold border ${perspective === "buyer" ? "bg-sky-50 text-sky-700 border-sky-200" : "bg-[var(--primary-soft)] text-[var(--primary)] border-pink-200"}`}>

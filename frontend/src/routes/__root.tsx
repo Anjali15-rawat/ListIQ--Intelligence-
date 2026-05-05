@@ -29,10 +29,10 @@ export const Route = createRootRoute({
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "ListIQ — AI-Powered Amazon Listing Intelligence" },
+      { title: "ListIQ - Intelligence" },
       { name: "description", content: "Audit any Amazon listing with AI. Get scores, pain points, competitor gaps, and exact fixes in seconds." },
-      { name: "author", content: "ListIQ" },
-      { property: "og:title", content: "ListIQ — AI-Powered Amazon Listing Intelligence" },
+      { name: "author", content: "ListIQ - Intelligence" },
+      { property: "og:title", content: "ListIQ - Intelligence" },
       { property: "og:description", content: "Audit any Amazon listing with AI. Get scores, pain points, competitor gaps, and exact fixes in seconds." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -78,6 +78,13 @@ function RootShell({ children }: { children: React.ReactNode }) {
   );
 }
 
+import { Toaster } from "@/components/ui/sonner";
+
 function RootComponent() {
-  return <Outlet />;
+  return (
+    <>
+      <Outlet />
+      <Toaster position="bottom-right" />
+    </>
+  );
 }

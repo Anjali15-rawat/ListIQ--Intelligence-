@@ -50,6 +50,22 @@ const SUGGESTION_GROUPS = [
     label: "🏆 Compete",
     chips: ["How do I beat competitors?", "Is my price right?", "Gaps I can exploit?"],
   },
+  {
+    label: "💰 Pricing",
+    chips: ["Is my pricing competitive?", "Should I add a coupon?", "What's the ideal price?"],
+  },
+  {
+    label: "🔍 SEO",
+    chips: ["What keywords am I missing?", "How does A9 algorithm work?", "Improve my ranking"],
+  },
+  {
+    label: "📷 Images",
+    chips: ["How many images do I need?", "What image types work best?", "Fix my main image"],
+  },
+  {
+    label: "🤖 AEO",
+    chips: ["How do AI search engines rank me?", "Explain AEO", "How to appear in ChatGPT results?"],
+  },
 ];
 
 /* ─── Kiti persona messages ─────────────────────────── */
@@ -187,19 +203,23 @@ export function FloatingAssistant({ url }: { url?: string }) {
   const sendMessage = async (text: string) => {
     if (!text.trim() || isTyping) return;
     setInput("");
-    setMessages(prev => [...prev, { role: "user", text, mood: "idle" }]);
+    const newMessages = [...messages, { role: "user", text, mood: "idle" as KitiMood }];
+    setMessages(newMessages);
     setIsTyping(true);
     setKitiMood("thinking");
 
     try {
-      const { data } = await api.chat(text, url || "");
+      // Send last 6 messages as conversation history for context
+      const history = newMessages.slice(-6).map(m => `${m.role === 'user' ? 'User' : 'Kiti'}: ${m.text}`).join('\n');
+      const contextMessage = history + '\nUser: ' + text;
+      const { data } = await api.chat(contextMessage, url || "");
       const response = data.response || "Hmm, I couldn't process that. Try asking differently! 🐱";
 
       // Detect mood from response content
       const mood: KitiMood =
-        response.includes("Great") || response.includes("excellent") || response.includes("amazing")
+        response.includes("Great") || response.includes("excellent") || response.includes("amazing") || response.includes("🌟") || response.includes("top-tier")
           ? "excited"
-          : response.includes("?") || response.includes("unclear")
+          : response.includes("?") || response.includes("unclear") || response.includes("analyze")
           ? "thinking"
           : "happy";
 
@@ -229,7 +249,8 @@ export function FloatingAssistant({ url }: { url?: string }) {
     setKitiMood("idle");
   };
 
-  const showSuggestions = messages.length <= 1 && !isTyping;
+  const [suggestionsExpanded, setSuggestionsExpanded] = useState(true);
+  const showSuggestions = suggestionsExpanded && !isTyping;
   const currentGroup = SUGGESTION_GROUPS[activeSuggGroup];
 
   return (
@@ -333,48 +354,60 @@ export function FloatingAssistant({ url }: { url?: string }) {
               <div ref={bottomRef} />
             </div>
 
-            {/* Suggestion chips — always show, rotate groups */}
-            <AnimatePresence>
-              {showSuggestions && (
-                <motion.div
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: "auto" }}
-                  exit={{ opacity: 0, height: 0 }}
-                  className="shrink-0 px-3 pb-2"
-                >
-                  {/* Group tabs */}
-                  <div className="flex gap-1.5 mb-2 overflow-x-auto no-scrollbar">
-                    {SUGGESTION_GROUPS.map((g, idx) => (
-                      <button
-                        key={g.label}
-                        onClick={() => setActiveSuggGroup(idx)}
-                        className={`text-[10px] font-semibold px-2.5 py-1 rounded-full whitespace-nowrap transition-all ${
-                          activeSuggGroup === idx
-                            ? "bg-primary-gradient text-white shadow-soft"
-                            : "bg-muted text-muted-foreground hover:bg-[var(--primary-soft)] hover:text-[var(--primary)]"
-                        }`}
-                      >
-                        {g.label}
-                      </button>
-                    ))}
-                  </div>
-                  {/* Chips */}
-                  <div className="flex gap-1.5 flex-wrap">
-                    {currentGroup.chips.map((s) => (
-                      <motion.button
-                        key={s}
-                        whileHover={{ scale: 1.04 }}
-                        whileTap={{ scale: 0.96 }}
-                        onClick={() => sendMessage(s)}
-                        className="text-xs px-3 py-1.5 rounded-full bg-[var(--primary-soft)] text-[var(--primary)] border border-pink-200 hover:bg-pink-100 hover:shadow-soft transition-all font-medium"
-                      >
-                        {s}
-                      </motion.button>
-                    ))}
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
+            {/* Suggestion chips — collapsible, always accessible */}
+            <div className="shrink-0 border-t border-border/30">
+              <button
+                onClick={() => setSuggestionsExpanded(!suggestionsExpanded)}
+                className="w-full flex items-center justify-between px-4 py-1.5 text-[10px] font-semibold text-muted-foreground hover:text-[var(--primary)] transition-colors"
+              >
+                <span className="flex items-center gap-1.5">
+                  <Sparkles className="h-3 w-3" />
+                  Quick Questions
+                </span>
+                <ChevronDown className={`h-3 w-3 transition-transform ${suggestionsExpanded ? 'rotate-180' : ''}`} />
+              </button>
+              <AnimatePresence>
+                {showSuggestions && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: "auto" }}
+                    exit={{ opacity: 0, height: 0 }}
+                    className="px-3 pb-2 overflow-hidden"
+                  >
+                    {/* Group tabs */}
+                    <div className="flex gap-1.5 mb-2 overflow-x-auto no-scrollbar">
+                      {SUGGESTION_GROUPS.map((g, idx) => (
+                        <button
+                          key={g.label}
+                          onClick={() => setActiveSuggGroup(idx)}
+                          className={`text-[10px] font-semibold px-2.5 py-1 rounded-full whitespace-nowrap transition-all ${
+                            activeSuggGroup === idx
+                              ? "bg-primary-gradient text-white shadow-soft"
+                              : "bg-muted text-muted-foreground hover:bg-[var(--primary-soft)] hover:text-[var(--primary)]"
+                          }`}
+                        >
+                          {g.label}
+                        </button>
+                      ))}
+                    </div>
+                    {/* Chips */}
+                    <div className="flex gap-1.5 flex-wrap">
+                      {currentGroup.chips.map((s) => (
+                        <motion.button
+                          key={s}
+                          whileHover={{ scale: 1.04 }}
+                          whileTap={{ scale: 0.96 }}
+                          onClick={() => { sendMessage(s); setSuggestionsExpanded(false); }}
+                          className="text-xs px-3 py-1.5 rounded-full bg-[var(--primary-soft)] text-[var(--primary)] border border-pink-200 hover:bg-pink-100 hover:shadow-soft transition-all font-medium"
+                        >
+                          {s}
+                        </motion.button>
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
 
             {/* Input row */}
             <div className="px-3 pb-3 pt-2 border-t border-border/40 flex gap-2 shrink-0 bg-card/80 backdrop-blur-sm">

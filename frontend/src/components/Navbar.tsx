@@ -34,7 +34,7 @@ export function Navbar() {
           <div className="h-9 w-9 rounded-xl bg-primary-gradient grid place-items-center shadow-glow group-hover:shadow-hover transition-all overflow-hidden">
             <KitiMascot type="avatar" size={28} animate={false} />
           </div>
-          <span className="font-extrabold text-xl tracking-tight text-foreground">ListIQ</span>
+          <span className="font-extrabold text-xl tracking-tight text-foreground">ListIQ - Intelligence</span>
         </Link>
 
         {/* Desktop nav */}

@@ -37,6 +37,9 @@ function detectIntent(msg) {
   if (m.match(/sell|sales|conversion|buy box|buybox|revenue/)) return 'sales';
   if (m.match(/categor|niche|market|segment/)) return 'category';
 
+  // AEO-specific intent
+  if (m.match(/aeo|ai search|chatgpt (rank|result|recommend)|claude (rank|result)|gemini (rank|result)|ai engine|llm rank|appear in (chatgpt|claude|gemini|ai)/)) return 'aeo';
+
   // Generic explain — absolute last resort before default
   if (m.match(/what is|what are|explain|tell me (about|more)|how does|why (is|does|do)/)) return 'explain';
   return 'general';
@@ -115,7 +118,9 @@ function respond(intent, msg, p) {
       return `**Bullet point formula that converts:**\n\n• **LEAD WITH BENEFIT** (in caps), then explain the feature behind it\n• Cover: main use case · material/build quality · dimensions · compatibility · warranty\n• Each bullet should pre-answer a buyer objection before they leave the page\n• Use power words: "Effortlessly", "Professional-grade", "Backed by 1-year warranty"\n• Keep each bullet under 200 characters so they render fully on mobile${hasProduct && ctx.features < 5 ? `\n\n⚠️ Your listing has only **${ctx.features} bullets** — aim for 5 to maximize coverage.` : ''}`;
 
     case 'images':
-      return `**7-image strategy (Amazon best practice):**\n\n• 1️⃣ Pure white background main image — mandatory, highest impact\n• 2️⃣ Lifestyle shot — product in real use/environment\n• 3️⃣ Feature infographic with text callouts\n• 4️⃣ Size/scale comparison (next to a hand or known object)\n• 5️⃣ Close-up of key differentiating feature\n• 6️⃣ Packaging + what's in the box\n• 7️⃣ Short **demo video** — adds ~9% average conversion lift\n\n📱 Optimize for mobile: 50%+ of buyers browse on phones — text on images should be readable at 400px.`;
+      if (!hasProduct)
+        return `**7-image strategy (Amazon best practice):**\n\n• 1️⃣ Pure white background main image — mandatory, highest impact\n• 2️⃣ Lifestyle shot — product in real use/environment\n• 3️⃣ Feature infographic with text callouts\n• 4️⃣ Size/scale comparison (next to a hand or known object)\n• 5️⃣ Close-up of key differentiating feature\n• 6️⃣ Packaging + what's in the box\n• 7️⃣ Short **demo video** — adds ~9% average conversion lift\n\n📱 Optimize for mobile: 50%+ of buyers browse on phones — text on images should be readable at 400px.`;
+      return `**Image audit for "${ctx.short}…":**\n\nYou currently have fewer images than top competitors. Here's exactly what to add:\n\n• 1️⃣ **Main image** — white background, fill 85%+ of frame\n• 2️⃣ **Lifestyle shot** — show real usage scenario\n• 3️⃣ **Infographic** — 3-4 key features with text callouts\n• 4️⃣ **Size chart/comparison** — reduces sizing complaints\n• 5️⃣ **Close-up** — highlight unique selling feature\n• 6️⃣ **What's in box** — set expectations to reduce returns\n• 7️⃣ **Video** — 30-60 second demo, +9% conversion lift\n\n⚡ **Impact:** Adding 5+ images typically increases conversion by 15-25%. This is your biggest growth lever right now.`;
 
     case 'keywords':
       return `**Keyword placement strategy:**\n\n• **Title** → primary keyword in first 5 words (highest A9 weight)\n• **Bullet headers** → secondary keywords in ALL CAPS\n• **Product description** → long-tail variants, natural sentences\n• **Backend search terms** → fill all 250 bytes, no commas, no repetition\n• **A+ Content alt text** → hidden keyword boost\n\n🔎 Free research: Amazon autocomplete, "Customers also bought", and competitor titles. Tools: Helium 10 Cerebro, Jungle Scout.${hasProduct ? `\n\nFor "${ctx.short}…", check that your top category keyword appears in the first 5 words of your title.` : ''}`;
@@ -166,12 +171,22 @@ function respond(intent, msg, p) {
       return `**Amazon Vine** lets you send free units to top-tier Amazon reviewers in exchange for honest, verified reviews.\n\n• Free for brand-registered sellers with **fewer than 30 existing reviews**\n• Enroll up to **30 units per ASIN**\n• Typically generates 10-20 detailed reviews within 4-6 weeks\n• Reviews can be positive or negative — they're unbiased\n• Best used on new launches to build initial review foundation quickly`;
 
     case 'explain':
-      return `Great question! I specialize in **Amazon listing optimization**. Try asking me something specific like:\n\n• *"How does my rating compare?"*\n• *"What are buyers complaining about?"*\n• *"How do I improve my title?"*\n• *"What keywords should I target?"*\n• *"Explain BSR"* or *"How does the A9 algorithm work?"*`;
+      return `Great question! I specialize in **Amazon listing optimization**. Try asking me something specific like:\n\n• *"How does my rating compare?"*\n• *"What are buyers complaining about?"*\n• *"How do I improve my title?"*\n• *"What keywords should I target?"*\n• *"Explain BSR"* or *"How does the A9 algorithm work?"*\n• *"How do AI search engines rank me?"* (AEO)\n• *"How many images do I need?"*`;
+
+    case 'aeo':
+      if (!hasProduct)
+        return `**AEO (AI Engine Optimization)** is the new frontier! 🤖\n\nWhen buyers ask ChatGPT, Claude, or Gemini for product recommendations, your listing needs to rank.\n\n**Key AEO ranking factors:**\n• **Review authority** — volume + sentiment across the web\n• **Semantic keyword match** — natural language phrases in your listing\n• **External brand mentions** — Reddit, blogs, YouTube reviews\n\nAnalyze a product first and I'll show you exactly where you stand in AI search results!`;
+      return `**AEO Analysis for "${ctx.short}…":**\n\nAI search engines rank based on:\n• **Review Authority** — ${(ctx.reviews||0) > 1000 ? 'Strong signal with ' + (ctx.reviews||0).toLocaleString() + ' reviews' : 'Weak — need more verified reviews'}\n• **Rating Quality** — ${ctx.rating >= 4.3 ? ctx.rating + '★ is solid for AI recommendations' : ctx.rating + '★ is below the 4.3★ threshold AI engines prefer'}\n• **Semantic Match** — Does your listing use natural phrases buyers type into ChatGPT?\n\n**To improve AEO:**\n1. Add benefit-driven phrases: "comfortable for daily wear", "best for walking"\n2. Build external authority: get mentioned on Reddit, YouTube reviews\n3. Improve review sentiment — address top complaints`;
+
+    case 'category':
+      if (!hasProduct)
+        return `Analyze a product first and I'll tell you about its category, niche positioning, and market opportunity. Paste an Amazon URL above! 🔍`;
+      return `**Category insights for "${ctx.short}…":**\n\n• **BSR:** ${ctx.bsr || 'Not available — run analysis for BSR data'}\n• **Reviews vs category average:** ${(ctx.reviews||0) > 500 ? 'Above average review count' : 'Below average — focus on review velocity'}\n• **Price positioning:** ${ctx.curr}${ctx.price} — check the Competitor tab to see where you sit\n\n💡 **Niche strategy:** Focus on long-tail keywords specific to your sub-category rather than competing on broad terms with established brands.`;
 
     default:
       if (!hasProduct)
-        return `Hi! I'm **Kiti** 🐱 Paste an Amazon URL in the search bar above and click **Analyze** — then ask me anything about:\n\n• Rating & reviews analysis\n• Pricing strategy\n• Title & keyword optimization\n• Image best practices\n• PPC advertising\n• Competitor gaps\n\nWhat would you like to know?`;
-      return `I'm looking at **"${ctx.short}…"** right now. You can ask me:\n\n• *"What are buyers complaining about?"*\n• *"How do I improve my rating?"*\n• *"Is my price competitive?"*\n• *"What keywords am I missing?"*\n• *"How can I improve conversion?"*`;
+        return `Hi! I'm **Kiti** 🐱 Your Amazon listing intelligence assistant. I can help with:\n\n📊 **Listing Audit** — score, title, images, A+ content\n💬 **Review Analysis** — complaints, praises, sentiment\n🏆 **Competitor Strategy** — gaps, pricing, market position\n🔍 **SEO & Keywords** — ranking, search terms, A9 algorithm\n🤖 **AEO** — how AI search engines see your product\n💰 **Pricing** — competitive analysis, coupon strategy\n📢 **PPC/Ads** — bid optimization, wasted spend\n\nPaste an Amazon URL above and click **Analyze** to get started! Or ask me any Amazon seller question.`;
+      return `I'm analyzing **"${ctx.short}…"** (${ctx.rating}★, ${(ctx.reviews||0).toLocaleString()} reviews, ${ctx.curr}${ctx.price}).\n\nHere's what I can help with right now:\n\n• *"What are buyers complaining about?"* — real review analysis\n• *"How do I improve my rating?"* — specific action steps\n• *"Is my price competitive?"* — market positioning\n• *"What keywords am I missing?"* — SEO opportunities\n• *"How do AI engines rank me?"* — AEO visibility\n• *"Give me a full improvement plan"* — prioritized actions\n\nWhat would you like to dive into? 🐾`;
   }
 }
 

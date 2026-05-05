@@ -11,7 +11,7 @@ const trendBadge: Record<string, string> = {
   low: "bg-sky-100 text-sky-700",
 };
 
-export function TimeMachineTab({ data }: { data?: any }) {
+export function TimeMachineTab({ data, isBuyer = false }: { data?: any, isBuyer?: boolean }) {
   const t = data || mockTimeMachine;
 
   return (
@@ -63,7 +63,7 @@ export function TimeMachineTab({ data }: { data?: any }) {
               <h3 className="font-semibold">Emerging complaints</h3>
             </div>
             <ul className="space-y-3">
-              {t.emergingIssues.map((i, idx) => (
+              {t.emergingIssues.map((i: any, idx: number) => (
                 <motion.li
                   key={idx}
                   initial={{ opacity: 0, x: -10 }}
@@ -97,7 +97,7 @@ export function TimeMachineTab({ data }: { data?: any }) {
               <h4 className="text-sm font-semibold">Suggested updates</h4>
             </div>
             <ul className="space-y-2">
-              {t.suggested.map((s, i) => (
+              {t.suggested.map((s: string, i: number) => (
                 <li key={i} className="flex gap-2 text-sm text-foreground/80">
                   <span className="text-[var(--primary)]">→</span>
                   {s}
