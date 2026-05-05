@@ -5,24 +5,12 @@ import apiRoutes from './routes/api.routes.js';
 
 const app = express();
 
-// Allow both 5173 and 5174 for local dev
-const allowedOrigins = [
-  'http://localhost:5173',
-  'http://localhost:5174',
-  'http://127.0.0.1:5173',
-  'http://127.0.0.1:5174',
-];
+app.use(helmet({
+  contentSecurityPolicy: false, // Disable CSP for easier integration with third-party APIs
+}));
 
-app.use(helmet());
 app.use(cors({
-  origin: (origin, callback) => {
-    // Allow requests with no origin (e.g. curl, Postman)
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error(`CORS blocked: ${origin}`));
-    }
-  },
+  origin: true, // In production, it is easier to allow 'true' which mirrors the request origin
   credentials: true,
 }));
 app.use(express.json());

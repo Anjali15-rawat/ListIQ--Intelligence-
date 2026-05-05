@@ -8,10 +8,9 @@ const config = {
   aiKey: process.env.OPENAI_API_KEY,
 };
 
-// Only crash on missing Rainforest key — AI key is validated at call time
+// Only warn on missing Rainforest key — the app will fall back to smart mock data
 if (!config.rainforestKey) {
-  console.error('❌ ERROR: Missing required environment variable: RAINFOREST_API_KEY');
-  process.exit(1);
+  console.warn('⚠️ WARNING: RAINFOREST_API_KEY not set — live data fetching will fall back to smart mock profiles');
 }
 
 if (!config.aiKey) {

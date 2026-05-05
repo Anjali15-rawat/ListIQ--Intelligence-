@@ -121,6 +121,32 @@ npm run dev
 - The **Frontend Dashboard** will be live at `http://localhost:5173`
 - The **Backend API** will be listening at `http://localhost:5000`
 
+## 🚀 Deployment
+
+### Backend (Deploy to Render)
+1. Create a new **Web Service** on [Render](https://render.com).
+2. Connect your GitHub repository.
+3. Set the following:
+   - **Root Directory**: `backend`
+   - **Build Command**: `npm install`
+   - **Start Command**: `node server.js`
+4. Add **Environment Variables**:
+   - `PORT`: `10000` (or leave default)
+   - `RAINFOREST_API_KEY`: Your key
+   - `OPENAI_API_KEY`: Your key
+5. Once deployed, copy your **service URL** (e.g., `https://listiq-backend.onrender.com`).
+
+### Frontend (Deploy to Netlify)
+1. Go to [Netlify](https://app.netlify.com).
+2. Click **Add new site** -> **Import from GitHub**.
+3. Select your repository and set:
+   - **Base directory**: `frontend`
+   - **Build command**: `npm run build`
+   - **Publish directory**: `frontend/dist/client`
+4. Add **Environment Variables**:
+   - `VITE_API_URL`: Your Render backend URL + `/api` (e.g., `https://listiq-backend.onrender.com/api`)
+5. Deploy!
+
 ---
 
 ## 🤝 Contributing

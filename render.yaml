@@ -1,0 +1,32 @@
+services:
+  # Backend Service
+  - type: web
+    name: listiq-backend
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: cd backend && npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: RAINFOREST_API_KEY
+        sync: false # User must set this in Render UI
+      - key: OPENAI_API_KEY
+        sync: false # User must set this in Render UI
+
+  # Frontend (Static Site - alternative to Netlify)
+  - type: static
+    name: listiq-frontend
+    env: static
+    plan: free
+    buildCommand: cd frontend && npm install && npm run build
+    staticPublishPath: frontend/dist/client
+    envVars:
+      - key: VITE_API_URL
+        value: https://listiq-backend.onrender.com/api # User might need to update this after backend is live
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
